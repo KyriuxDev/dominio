@@ -9,6 +9,37 @@ class UsuarioModel {
         $this->ldap = new Ldap();
     }
 
+    public function buscar($sam) {
+        $attrs = array(
+            'sAMAccountName', 'displayName', 'givenName', 'sn',
+            'description', 'info', 'title', 'department', 'company',
+            'co', 'countryCode', 'employeeID', 'employeeType', 'division',
+            'mail', 'userPrincipalName', 'telephoneNumber', 'otherTelephone',
+            'physicalDeliveryOfficeName', 'streetAddress', 'postalCode', 'l', 'st',
+            'delegacion', 'extensionAttribute2',
+            // Cuenta
+            'userAccountControl', 'accountExpires', 'pwdLastSet',
+            'badPwdCount', 'badPasswordTime', 'lockoutTime',
+            'lastLogon', 'lastLogonTimestamp', 'logonCount',
+            'logonHours', 'userWorkstations', 'scriptPath',
+            'profilePath', 'homeDirectory',
+            // Grupos
+            'memberOf',
+            // Contraseña expira
+            'msDS-UserPasswordExpiryTimeComputed',
+            // Foto
+            'thumbnailPhoto',
+        );
+
+        $filter = '(&(objectClass=user)(sAMAccountName=' . ldap_escape($sam, '', LDAP_ESCAPE_FILTER) . '))';
+
+        $this->ldap->connect();
+        $entry = $this->ldap->searchOne('DC=sur,DC=imss,DC=gob,DC=mx', $filter, $attrs);
+        $this->ldap->disconnect();
+
+        return $entry;
+    }
+
     public function listar() {
         $attrs = array(
             'sAMAccountName', 'userPrincipalName', 'mail',

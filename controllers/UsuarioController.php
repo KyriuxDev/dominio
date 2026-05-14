@@ -6,6 +6,30 @@ class UsuarioController {
     // Minutos antes de que el cache expire automáticamente
     const CACHE_TTL = 30;
 
+    public function detalle() {
+        $sam   = isset($_GET['q']) ? trim($_GET['q']) : '';
+        $entry = null;
+        $error = '';
+
+        if ($sam !== '') {
+            $model = new UsuarioModel();
+            try {
+                $entry = $model->buscar($sam);
+                if (!$entry) {
+                    $error = 'Usuario no encontrado: ' . htmlspecialchars($sam);
+                }
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+            }
+        } else {
+            $error = 'No se especifico un usuario.';
+        }
+
+        require_once __DIR__ . '/../views/layout/header.php';
+        require_once __DIR__ . '/../views/usuarios/detalle.php';
+        require_once __DIR__ . '/../views/layout/footer.php';
+    }
+
     public function lista() {
         $results  = array();
         $error    = '';
@@ -36,7 +60,7 @@ class UsuarioController {
         }
 
         $cacheInfo = isset($_SESSION['usuarios_cache_time'])
-            ? date('d/m/Y H:i', $_SESSION['usuarios_cache_time'])
+            ? date('d/m/Y H:i', $_SESSION['usuarios_cache_time'] + TZ_OFFSET * 3600)
             : null;
 
         require_once __DIR__ . '/../views/layout/header.php';
