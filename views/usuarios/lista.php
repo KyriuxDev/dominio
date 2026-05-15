@@ -9,6 +9,9 @@
     <form method="post" action="">
       <button type="submit">Actualizar</button>
     </form>
+    <a href="/dominio/?c=usuario&a=exportar" class="btn" style="background:#1a7a1a">
+      Exportar CSV
+    </a>
     <input type="text"
            id="filtro"
            placeholder="Filtrar por nombre, correo, area..."

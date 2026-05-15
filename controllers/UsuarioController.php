@@ -67,4 +67,39 @@ class UsuarioController {
         require_once __DIR__ . '/../views/usuarios/lista.php';
         require_once __DIR__ . '/../views/layout/footer.php';
     }
+
+    public function exportar() {
+        // Tiempo máximo: 5 minutos para consultas grandes
+        set_time_limit(300);
+
+        $model = new UsuarioModel();
+        try {
+            $data = $model->exportar();
+        } catch (Exception $e) {
+            die('Error: ' . $e->getMessage());
+        }
+
+        $filename = 'trabajadores_oaxaca_' . date('Ymd_Hi') . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $out = fopen('php://output', 'w');
+        fputs($out, "\xEF\xBB\xBF"); // BOM UTF-8 para Excel
+
+        fputcsv($out, $data['headers']);
+
+        foreach ($data['rows'] as $row) {
+            $line = array();
+            foreach ($data['headers'] as $h) {
+                $line[] = isset($row[$h]) ? $row[$h] : '';
+            }
+            fputcsv($out, $line);
+        }
+
+        fclose($out);
+        exit;
+    }
 }
